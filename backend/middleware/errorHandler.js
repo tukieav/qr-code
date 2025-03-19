@@ -1,32 +1,35 @@
-// backend/middleware/errorHandler.js
+// middleware/errorHandler.js
 const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);
-
+    // Domyślny status błędu
     let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    let message = err.message || 'Server Error';
+    let message = err.message || 'Wystąpił błąd serwera';
 
-    // Handle Mongoose validation errors
+    // Sprawdzanie błędów Mongoose walidacji
     if (err.name === 'ValidationError') {
         statusCode = 400;
         message = Object.values(err.errors).map(val => val.message).join(', ');
     }
 
-    // Handle Mongoose duplicate key
+    // Sprawdzanie błędów Mongoose duplicate key
     if (err.code === 11000) {
         statusCode = 400;
-        message = `Duplicate value entered for ${Object.keys(err.keyValue)} field`;
+        message = `Duplikat wartości w polu: ${Object.keys(err.keyValue).join(', ')}`;
     }
 
-    // Handle Mongoose bad ObjectId
-    if (err.name === 'CastError') {
+    // Sprawdzanie błędów Mongoose invalid ID
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
         statusCode = 404;
-        message = `Resource not found`;
+        message = 'Nie znaleziono zasobu';
     }
 
+    // Logowanie błędu do konsoli
+    console.error(`[${new Date().toISOString()}] ${err.stack}`);
+
+    // Wysyłanie odpowiedzi z błędem
     res.status(statusCode).json({
         success: false,
         message,
-        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 };
 

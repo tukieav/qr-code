@@ -1,50 +1,67 @@
-// frontend/src/components/common/Notification.js
-import React, { useContext } from 'react';
+// src/components/common/Notification.js
+import React, { useContext, useEffect } from 'react';
 import { UIContext } from '../../context/UIContext';
-import {
-    CheckCircleIcon,
-    ExclamationCircleIcon,
-    InformationCircleIcon,
-    XIcon
-} from '@heroicons/react/outline';
+import { CheckCircleIcon, ExclamationIcon, InformationCircleIcon, XCircleIcon, XIcon } from '@heroicons/react/solid';
 
 const Notification = () => {
-    const { notification, showNotification } = useContext(UIContext);
+    const { notification, hideNotification } = useContext(UIContext);
 
-    if (!notification) return null;
+    // Automatyczne usuwanie powiadomienia przy odmontowaniu komponentu
+    useEffect(() => {
+        return () => {
+            hideNotification();
+        };
+    }, [hideNotification]);
 
-    const { message, type } = notification;
+    if (!notification) {
+        return null;
+    }
 
-    const bgColor =
-        type === 'success' ? 'bg-green-100 border-green-500' :
-            type === 'error' ? 'bg-red-100 border-red-500' :
-                type === 'warning' ? 'bg-yellow-100 border-yellow-500' :
-                    'bg-blue-100 border-blue-500';
+    // Określenie ikony i klasy stylu na podstawie typu powiadomienia
+    let icon;
+    let bgColorClass;
+    let textColorClass;
 
-    const textColor =
-        type === 'success' ? 'text-green-700' :
-            type === 'error' ? 'text-red-700' :
-                type === 'warning' ? 'text-yellow-700' :
-                    'text-blue-700';
-
-    const Icon =
-        type === 'success' ? CheckCircleIcon :
-            type === 'error' ? ExclamationCircleIcon :
-                InformationCircleIcon;
+    switch (notification.type) {
+        case 'success':
+            icon = <CheckCircleIcon className="h-6 w-6" />;
+            bgColorClass = 'bg-green-50';
+            textColorClass = 'text-green-800';
+            break;
+        case 'error':
+            icon = <XCircleIcon className="h-6 w-6" />;
+            bgColorClass = 'bg-red-50';
+            textColorClass = 'text-red-800';
+            break;
+        case 'warning':
+            icon = <ExclamationIcon className="h-6 w-6" />;
+            bgColorClass = 'bg-yellow-50';
+            textColorClass = 'text-yellow-800';
+            break;
+        case 'info':
+        default:
+            icon = <InformationCircleIcon className="h-6 w-6" />;
+            bgColorClass = 'bg-blue-50';
+            textColorClass = 'text-blue-800';
+            break;
+    }
 
     return (
         <div className="fixed top-4 right-4 z-50 max-w-md">
-            <div className={`${bgColor} ${textColor} border-l-4 p-4 rounded shadow-md`}>
-                <div className="flex justify-between items-start">
-                    <div className="flex items-start">
-                        <Icon className="h-5 w-5 mr-2 mt-0.5" />
-                        <p>{message}</p>
-                    </div>
+            <div className={`${bgColorClass} ${textColorClass} p-4 rounded-lg shadow-lg flex items-start`}>
+                <div className="flex-shrink-0">
+                    {icon}
+                </div>
+                <div className="ml-3 flex-1">
+                    <p className="text-sm font-medium">{notification.message}</p>
+                </div>
+                <div className="ml-4 flex-shrink-0 flex">
                     <button
-                        onClick={() => showNotification(null)}
-                        className="ml-4 text-gray-500 hover:text-gray-700"
+                        type="button"
+                        className={`inline-flex ${textColorClass} hover:opacity-75 focus:outline-none`}
+                        onClick={hideNotification}
                     >
-                        <XIcon className="h-4 w-4" />
+                        <XIcon className="h-5 w-5" />
                     </button>
                 </div>
             </div>
