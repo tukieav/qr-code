@@ -5,22 +5,17 @@ import { PlusIcon } from '@heroicons/react/outline';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
 import api from '../../services/api';
-import Navbar from '../../components/common/Navbar';
-import Sidebar from '../../components/common/Sidebar';
-import QRCodeFilters from '../../components/qrcodes/QRCodeFilters';
+import { formatDate, getQRCodeSurveyUrl } from '../../utils/QRCodeUtils';
+
+// Importy komponentów
+import { Navbar, Sidebar, DataFilters } from '../../components/common';
 import QRCodeList from '../../components/qrcodes/QRCodeList';
 import QRCodeModal from '../../components/qrcodes/QRCodeModal';
-import {
-    formatDate,
-    getQRCodeSurveyUrl,
-    getSortedAndFilteredQRCodes
-} from '../../utils/QRCodeUtils';
 
 const QRCodeManagement = () => {
     const [qrCodes, setQRCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [confirmDelete, setConfirmDelete] = useState(null);
     const [sortColumn, setSortColumn] = useState('creation_date');
     const [sortDirection, setSortDirection] = useState('desc');
     const [searchQuery, setSearchQuery] = useState('');
@@ -82,7 +77,6 @@ const QRCodeManagement = () => {
 
             // Usunięcie kodu QR z lokalnego stanu
             setQRCodes(prevQRCodes => prevQRCodes.filter(qrCode => qrCode._id !== id));
-            setConfirmDelete(null);
 
             showNotification('Kod QR został usunięty', 'success');
         } catch (error) {
@@ -156,6 +150,54 @@ const QRCodeManagement = () => {
         }
     };
 
+    // Filtrowanie danych
+    const getFilteredData = () => {
+        return qrCodes
+            // Filtrowanie według statusu aktywności
+            .filter(qrCode => {
+                if (filterActive === 'all') return true;
+                return filterActive === 'active' ? qrCode.is_active : !qrCode.is_active;
+            })
+            // Filtrowanie według wyszukiwanego tekstu
+            .filter(qrCode => {
+                if (!searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                return (
+                    qrCode.name.toLowerCase().includes(query) ||
+                    (qrCode.survey_id && qrCode.survey_id.title && qrCode.survey_id.title.toLowerCase().includes(query))
+                );
+            })
+            // Sortowanie
+            .sort((a, b) => {
+                let comparison = 0;
+                const direction = sortDirection === 'asc' ? 1 : -1;
+
+                // Sortowanie według różnych kolumn
+                switch (sortColumn) {
+                    case 'name':
+                        comparison = a.name.localeCompare(b.name);
+                        break;
+                    case 'survey_title':
+                        const titleA = (a.survey_id && a.survey_id.title) || '';
+                        const titleB = (b.survey_id && b.survey_id.title) || '';
+                        comparison = titleA.localeCompare(titleB);
+                        break;
+                    case 'scan_count':
+                        comparison = (a.scan_count || 0) - (b.scan_count || 0);
+                        break;
+                    case 'is_active':
+                        comparison = (a.is_active === b.is_active) ? 0 : a.is_active ? -1 : 1;
+                        break;
+                    case 'creation_date':
+                    default:
+                        comparison = new Date(a.creation_date) - new Date(b.creation_date);
+                        break;
+                }
+
+                return comparison * direction;
+            });
+    };
+
     // Widok ładowania
     if (loading) {
         return (
@@ -174,18 +216,11 @@ const QRCodeManagement = () => {
         );
     }
 
-    // Pobieranie przefiltrowanych i posortowanych kodów QR
-    const filteredQRCodes = getSortedAndFilteredQRCodes(
-        qrCodes,
-        filterActive,
-        searchQuery,
-        sortColumn,
-        sortDirection
-    );
-
     return (
         <div className="flex h-screen bg-gray-100">
             <Sidebar />
+
+            {/* Modal do wyświetlania szczegółów kodu QR */}
             <QRCodeModal
                 showQRCodeModal={showQRCodeModal}
                 selectedQRCode={selectedQRCode}
@@ -194,6 +229,7 @@ const QRCodeManagement = () => {
                 handleDownloadQRCode={handleDownloadQRCode}
                 showNotification={showNotification}
             />
+
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Navbar title="Zarządzanie kodami QR" />
 
@@ -218,17 +254,18 @@ const QRCodeManagement = () => {
                         )}
 
                         {/* Filtry i wyszukiwarka */}
-                        <QRCodeFilters
+                        <DataFilters
                             searchQuery={searchQuery}
                             setSearchQuery={setSearchQuery}
                             filterActive={filterActive}
                             setFilterActive={setFilterActive}
+                            searchPlaceholder="Szukaj kodów QR..."
                         />
 
                         {/* Lista kodów QR */}
                         <div className="bg-white shadow overflow-hidden sm:rounded-md">
                             <QRCodeList
-                                qrCodes={filteredQRCodes}
+                                qrCodes={getFilteredData()}
                                 sortColumn={sortColumn}
                                 sortDirection={sortDirection}
                                 handleSort={handleSort}
@@ -236,8 +273,6 @@ const QRCodeManagement = () => {
                                 handleGetQRCode={handleGetQRCode}
                                 handleDownloadQRCode={handleDownloadQRCode}
                                 handleToggleActive={handleToggleActive}
-                                confirmDelete={confirmDelete}
-                                setConfirmDelete={setConfirmDelete}
                                 handleDeleteQRCode={handleDeleteQRCode}
                                 formatDate={formatDate}
                             />

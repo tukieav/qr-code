@@ -5,17 +5,16 @@ import { PlusIcon } from '@heroicons/react/outline';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
 import api from '../../services/api';
-import Navbar from '../../components/common/Navbar';
-import Sidebar from '../../components/common/Sidebar';
-import SurveyFilters from '../../components/surveys/SurveyFilters';
+import { formatDate } from '../../utils/SurveyUtils';
+
+// Importy komponentów
+import { Navbar, Sidebar, DataFilters } from '../../components/common';
 import SurveyList from '../../components/surveys/SurveyList';
-import { formatDate, getSortedAndFilteredSurveys } from '../../utils/SurveyUtils';
 
 const SurveyManagement = () => {
     const [surveys, setSurveys] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [confirmDelete, setConfirmDelete] = useState(null);
     const [sortColumn, setSortColumn] = useState('creation_date');
     const [sortDirection, setSortDirection] = useState('desc');
     const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +74,6 @@ const SurveyManagement = () => {
 
             // Usunięcie ankiety z lokalnego stanu
             setSurveys(prevSurveys => prevSurveys.filter(survey => survey._id !== id));
-            setConfirmDelete(null);
 
             showNotification('Ankieta została usunięta', 'success');
         } catch (error) {
@@ -87,14 +85,18 @@ const SurveyManagement = () => {
         }
     };
 
-    // Obsługa duplikowania ankiety
+    // Obsługa duplikowania ankiety - przyjmuje cały obiekt ankiety zamiast samego ID
     const handleDuplicateSurvey = async (survey) => {
         try {
+            if (!survey || !survey.title) {
+                throw new Error('Brak danych ankiety do zduplikowania');
+            }
+
             // Przygotowanie nowej ankiety na podstawie istniejącej
             const newSurvey = {
                 title: `${survey.title} (Kopia)`,
-                description: survey.description,
-                questions: survey.questions,
+                description: survey.description || '',
+                questions: survey.questions || [],
                 is_active: false // Domyślnie nieaktywna
             };
 
@@ -125,6 +127,65 @@ const SurveyManagement = () => {
         }
     };
 
+    // Filtrowanie danych z obsługą błędów
+    const getFilteredData = () => {
+        if (!Array.isArray(surveys)) return [];
+
+        return surveys
+            // Filtrowanie według statusu aktywności
+            .filter(survey => {
+                if (!survey) return false;
+                if (filterActive === 'all') return true;
+                return filterActive === 'active' ? !!survey.is_active : !survey.is_active;
+            })
+            // Filtrowanie według wyszukiwanego tekstu
+            .filter(survey => {
+                if (!survey) return false;
+                if (!searchQuery) return true;
+
+                const query = searchQuery.toLowerCase();
+                const title = (survey.title || '').toLowerCase();
+                const description = (survey.description || '').toLowerCase();
+
+                return title.includes(query) || description.includes(query);
+            })
+            // Sortowanie
+            .sort((a, b) => {
+                if (!a || !b) return 0;
+
+                let comparison = 0;
+                const direction = sortDirection === 'asc' ? 1 : -1;
+
+                // Sortowanie według różnych kolumn
+                switch (sortColumn) {
+                    case 'title':
+                        comparison = (a.title || '').localeCompare(b.title || '');
+                        break;
+                    case 'question_count':
+                        const aCount = Array.isArray(a.questions) ? a.questions.length : 0;
+                        const bCount = Array.isArray(b.questions) ? b.questions.length : 0;
+                        comparison = aCount - bCount;
+                        break;
+                    case 'is_active':
+                        comparison = (a.is_active === b.is_active) ? 0 : a.is_active ? -1 : 1;
+                        break;
+                    case 'creation_date':
+                    default:
+                        // Bezpieczne porównanie dat
+                        try {
+                            const dateA = a.creation_date ? new Date(a.creation_date) : new Date(0);
+                            const dateB = b.creation_date ? new Date(b.creation_date) : new Date(0);
+                            comparison = dateA - dateB;
+                        } catch (e) {
+                            comparison = 0;
+                        }
+                        break;
+                }
+
+                return comparison * direction;
+            });
+    };
+
     // Widok ładowania
     if (loading) {
         return (
@@ -142,15 +203,6 @@ const SurveyManagement = () => {
             </div>
         );
     }
-
-    // Pobieranie przefiltrowanych i posortowanych ankiet
-    const filteredSurveys = getSortedAndFilteredSurveys(
-        surveys,
-        filterActive,
-        searchQuery,
-        sortColumn,
-        sortDirection
-    );
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -179,24 +231,23 @@ const SurveyManagement = () => {
                         )}
 
                         {/* Filtry i wyszukiwarka */}
-                        <SurveyFilters
+                        <DataFilters
                             searchQuery={searchQuery}
                             setSearchQuery={setSearchQuery}
                             filterActive={filterActive}
                             setFilterActive={setFilterActive}
+                            searchPlaceholder="Szukaj ankiet..."
                         />
 
                         {/* Lista ankiet */}
                         <div className="bg-white shadow overflow-hidden sm:rounded-md">
                             <SurveyList
-                                surveys={filteredSurveys}
+                                surveys={getFilteredData()}
                                 sortColumn={sortColumn}
                                 sortDirection={sortDirection}
                                 handleSort={handleSort}
                                 handleToggleActive={handleToggleActive}
                                 handleDuplicateSurvey={handleDuplicateSurvey}
-                                confirmDelete={confirmDelete}
-                                setConfirmDelete={setConfirmDelete}
                                 handleDeleteSurvey={handleDeleteSurvey}
                                 formatDate={formatDate}
                             />
