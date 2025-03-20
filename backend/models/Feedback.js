@@ -38,6 +38,26 @@ const FeedbackSchema = new mongoose.Schema({
         browser: String,
         device: String,
         ip: String // Note: Store this carefully, complying with privacy laws
+    },
+    business_response: {
+        text: String,
+        date: Date
+    },
+
+    // Opcjonalny email klienta do otrzymania odpowiedzi
+    client_email: {
+        type: String,
+        trim: true
+    },
+
+    // Dodajemy pole do zgłaszania nieodpowiednich opinii
+    reported: {
+        is_reported: {
+            type: Boolean,
+            default: false
+        },
+        reason: String,
+        date: Date
     }
 }, { timestamps: true });
 

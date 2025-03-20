@@ -66,6 +66,19 @@ const BusinessSchema = new mongoose.Schema({
     registration_date: {
         type: Date,
         default: Date.now
+    },
+    stripe_customer_id: {
+        type: String
+    },
+    stripe_subscription_id: {
+        type: String
+    },
+
+    // Status płatności
+    payment_status: {
+        type: String,
+        enum: ['none', 'active', 'failed', 'canceled'],
+        default: 'none'
     }
 }, { timestamps: true });
 

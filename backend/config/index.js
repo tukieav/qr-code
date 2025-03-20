@@ -17,6 +17,24 @@ const defaultConfig = {
     port: parseInt(process.env.PORT, 10) || 5000,
     host: process.env.HOST || 'localhost',
 
+    stripe: {
+        secretKey: process.env.STRIPE_SECRET_KEY,
+        webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+        currency: 'pln',
+        products: {
+            basic: {
+                priceId: process.env.STRIPE_BASIC_PRICE_ID,
+                amount: 4900, // 49.00 PLN w groszach
+                name: 'Plan Podstawowy'
+            },
+            pro: {
+                priceId: process.env.STRIPE_PRO_PRICE_ID,
+                amount: 9900, // 99.00 PLN w groszach
+                name: 'Plan Pro'
+            }
+        }
+    },
+
     // Baza danych
     db: {
         uri: process.env.MONGO_URI || 'mongodb://localhost:27017/qr-opinion',

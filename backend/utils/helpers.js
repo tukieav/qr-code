@@ -108,3 +108,53 @@ exports.slugify = (text) => {
         .replace(/[^\w-]+/g, '')
         .replace(/--+/g, '-');
 };
+/**
+ * Walidacja numeru karty płatniczej z użyciem algorytmu Luhna
+ * @param {String} cardNumber - Numer karty do walidacji
+ * @returns {Boolean} - Czy numer karty jest poprawny
+ */
+exports.validateCreditCard = (cardNumber) => {
+    // Usuń białe znaki i sprawdź, czy zawiera tylko cyfry
+    const sanitizedNumber = cardNumber.replace(/\s+/g, '');
+    if (!/^\d+$/.test(sanitizedNumber)) return false;
+
+    // Algorytm Luhna
+    let sum = 0;
+    let doubleUp = false;
+
+    for (let i = sanitizedNumber.length - 1; i >= 0; i--) {
+        let digit = parseInt(sanitizedNumber.charAt(i), 10);
+
+        if (doubleUp) {
+            digit *= 2;
+            if (digit > 9) digit -= 9;
+        }
+
+        sum += digit;
+        doubleUp = !doubleUp;
+    }
+
+    return sum % 10 === 0;
+};
+
+/**
+ * Maskowanie numeru karty płatniczej
+ * @param {String} cardNumber - Pełny numer karty
+ * @returns {String} - Zamaskowany numer karty
+ */
+exports.maskCreditCard = (cardNumber) => {
+    if (!cardNumber) return '';
+
+    // Usuń białe znaki
+    const sanitizedNumber = cardNumber.replace(/\s+/g, '');
+
+    // Pozostaw pierwsze 6 i ostatnie 4 cyfry
+    const firstSix = sanitizedNumber.substring(0, 6);
+    const lastFour = sanitizedNumber.substring(sanitizedNumber.length - 4);
+
+    // Zamaskuj środkowe cyfry
+    const maskedMiddle = '•'.repeat(sanitizedNumber.length - 10);
+
+    // Sformatuj dla czytelności
+    return `${firstSix} ${maskedMiddle} ${lastFour}`;
+};

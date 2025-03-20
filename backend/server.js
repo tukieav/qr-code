@@ -1,4 +1,5 @@
 // backend/server.js
+const connectDB = require('./config/db');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -35,6 +36,10 @@ if (process.env.NODE_ENV === 'production') {
 if (config.security && config.security.enableCompression) {
     app.use(compression());
 }
+
+// Specjalna konfiguracja dla webhooków Stripe (potrzebujemy surowego body)
+app.post('/api/subscription/webhook', express.raw({ type: 'application/json' }));
+
 
 // Parsowanie danych JSON
 app.use(express.json());

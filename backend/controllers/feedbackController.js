@@ -2,7 +2,9 @@
 const Feedback = require('../models/Feedback');
 const QRCode = require('../models/QRCode');
 const Survey = require('../models/Survey');
+const Business = require('../models/Business');
 const mongoose = require('mongoose');
+const { emailService } = require('../utils/emailService');
 
 // Submit feedback (public route - no authentication)
 exports.submitFeedback = async (req, res, next) => {
@@ -234,6 +236,265 @@ exports.getSingleFeedback = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
+            data: feedback
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+exports.getSingleFeedback = async (req, res, next) => {
+    try {
+        const feedback = await Feedback.findById(req.params.id)
+            .populate({
+                path: 'qr_code_id',
+                select: 'name unique_code',
+                populate: {
+                    path: 'survey_id',
+                    select: 'title questions'
+                }
+            });
+
+        if (!feedback) {
+            return res.status(404).json({
+                success: false,
+                message: 'Opinia nie znaleziona'
+            });
+        }
+
+        // Sprawdź, czy firma ma dostęp do opinii
+        if (feedback.business_id.toString() !== req.business._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Brak uprawnień do tej opinii'
+            });
+        }
+
+        // Dodaj analizę sentymentu
+        const sentimentScore = await analyzeSentiment(feedback.comment);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                ...feedback.toObject(),
+                sentiment: sentimentScore
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Dodatkowa funkcja do analizy sentymentu (prosta implementacja)
+const analyzeSentiment = async (text) => {
+    if (!text || text.trim() === '') {
+        return {
+            score: 0,
+            label: 'neutral'
+        };
+    }
+
+    // Słownik pozytywnych i negatywnych słów (prosta implementacja)
+    const positiveWords = ['dobry', 'świetny', 'wspaniały', 'doskonały', 'zadowolony', 'polecam'];
+    const negativeWords = ['zły', 'słaby', 'okropny', 'fatalny', 'niezadowolony', 'rozczarowany'];
+
+    const normalizedText = text.toLowerCase();
+    let score = 0;
+
+    // Zliczanie słów
+    positiveWords.forEach(word => {
+        if (normalizedText.includes(word)) score += 1;
+    });
+
+    negativeWords.forEach(word => {
+        if (normalizedText.includes(word)) score -= 1;
+    });
+
+    // Określ etykietę na podstawie wyniku
+    let label = 'neutral';
+    if (score > 0) label = 'positive';
+    if (score < 0) label = 'negative';
+
+    return {
+        score,
+        label
+    };
+};
+
+// Nowa funkcja - odpowiedź na opinię
+exports.respondToFeedback = async (req, res, next) => {
+    try {
+        const { response_text } = req.body;
+
+        if (!response_text || response_text.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Treść odpowiedzi jest wymagana'
+            });
+        }
+
+        const feedback = await Feedback.findById(req.params.id);
+
+        if (!feedback) {
+            return res.status(404).json({
+                success: false,
+                message: 'Opinia nie znaleziona'
+            });
+        }
+
+        // Sprawdź, czy firma ma dostęp do opinii
+        if (feedback.business_id.toString() !== req.business._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Brak uprawnień do tej opinii'
+            });
+        }
+
+        // Aktualizuj opinię o odpowiedź
+        feedback.business_response = {
+            text: response_text,
+            date: new Date()
+        };
+
+        await feedback.save();
+
+        // Jeśli klient podał email, wyślij powiadomienie
+        if (feedback.client_email) {
+            try {
+                // Pobierz dane firmy
+                const business = await Business.findById(req.business._id);
+
+                // Wyślij email z odpowiedzią
+                await emailService.sendFeedbackResponseNotification(
+                    feedback.client_email,
+                    business.business_name,
+                    feedback.rating,
+                    feedback.comment,
+                    response_text
+                );
+            } catch (emailError) {
+                console.error('Błąd wysyłania emaila:', emailError);
+                // Nie blokujemy odpowiedzi, jeśli email nie został wysłany
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            data: feedback
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Nowa funkcja - zbiorczy eksport danych opinii
+exports.exportFeedback = async (req, res, next) => {
+    try {
+        const { format, startDate, endDate } = req.query;
+
+        // Buduj zapytanie
+        const query = { business_id: req.business._id };
+
+        // Filtracja po dacie
+        if (startDate && endDate) {
+            query.submission_date = {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            };
+        }
+
+        // Pobierz opinie
+        const feedback = await Feedback.find(query)
+            .populate({
+                path: 'qr_code_id',
+                select: 'name',
+                populate: {
+                    path: 'survey_id',
+                    select: 'title'
+                }
+            })
+            .sort({ submission_date: -1 });
+
+        if (format === 'csv') {
+            // Przygotuj dane do eksportu CSV
+            const csvData = [
+                // Nagłówki
+                ['ID', 'Data', 'Ocena', 'Komentarz', 'Ankieta', 'Kod QR']
+            ];
+
+            // Dane
+            feedback.forEach(item => {
+                csvData.push([
+                    item._id.toString(),
+                    new Date(item.submission_date).toISOString(),
+                    item.rating || '',
+                    item.comment || '',
+                    (item.qr_code_id && item.qr_code_id.survey_id) ? item.qr_code_id.survey_id.title : '',
+                    item.qr_code_id ? item.qr_code_id.name : ''
+                ]);
+            });
+
+            // Konwertuj na string CSV
+            const csvContent = csvData.map(row => row.join(',')).join('\n');
+
+            // Ustaw nagłówki odpowiedzi
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename=feedback_export.csv');
+
+            return res.status(200).send(csvContent);
+        }
+
+        // Domyślny format JSON
+        res.status(200).json({
+            success: true,
+            count: feedback.length,
+            data: feedback
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Nowa funkcja - zgłaszanie opinii jako nieodpowiedniej
+exports.reportFeedback = async (req, res, next) => {
+    try {
+        const { reason } = req.body;
+
+        if (!reason) {
+            return res.status(400).json({
+                success: false,
+                message: 'Podaj powód zgłoszenia'
+            });
+        }
+
+        const feedback = await Feedback.findById(req.params.id);
+
+        if (!feedback) {
+            return res.status(404).json({
+                success: false,
+                message: 'Opinia nie znaleziona'
+            });
+        }
+
+        // Sprawdź, czy firma ma dostęp do opinii
+        if (feedback.business_id.toString() !== req.business._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Brak uprawnień do tej opinii'
+            });
+        }
+
+        // Zaktualizuj opinię o zgłoszenie
+        feedback.reported = {
+            is_reported: true,
+            reason: reason,
+            date: new Date()
+        };
+
+        await feedback.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Opinia została zgłoszona',
             data: feedback
         });
     } catch (error) {

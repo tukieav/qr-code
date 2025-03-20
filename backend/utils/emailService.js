@@ -145,3 +145,56 @@ exports.sendNewFeedbackNotification = async (business, feedback) => {
         throw error;
     }
 };
+
+/**
+* Wysyła email z powiadomieniem o odpowiedzi na opinię
+* @param {String} clientEmail - Email klienta
+* @param {String} businessName - Nazwa firmy
+* @param {Number} rating - Ocena klienta
+* @param {String} comment - Komentarz klienta
+* @param {String} responseText - Odpowiedź firmy
+* @returns {Promise} - Rezultat wysyłania
+*/
+
+exports.sendFeedbackResponseNotification = async (clientEmail, businessName, rating, comment, responseText) => {
+    try {
+        // Formatowanie oceny gwiazdkowej
+        const ratingStars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+        const message = {
+            from: `"QR Opinion" <${process.env.EMAIL_FROM || 'no-reply@qropinion.com'}>`,
+            to: clientEmail,
+            subject: `${businessName} odpowiedział na Twoją opinię`,
+            html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Otrzymałeś odpowiedź na swoją opinię!</h2>
+          <p>Firma ${businessName} odpowiedziała na Twoją opinię.</p>
+          
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 4px; margin: 20px 0;">
+            <p><strong>Twoja ocena:</strong> ${ratingStars} (${rating}/5)</p>
+${comment ? `<p><strong>Twój komentarz:</strong> "${comment}"</p>` : ''}
+           <p style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+             <strong>Odpowiedź firmy ${businessName}:</strong>
+           </p>
+           <p style="font-style: italic;">"${responseText}"</p>
+         </div>
+         
+         <p>Dziękujemy za skorzystanie z systemu QR Opinion do przekazywania opinii.</p>
+         
+         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+           <p style="font-size: 12px; color: #666;">
+             © ${new Date().getFullYear()} QR Opinion. Wszelkie prawa zastrzeżone.
+           </p>
+         </div>
+       </div>
+     `
+        };
+
+        const info = await transporter.sendMail(message);
+        console.log(`Powiadomienie o odpowiedzi na opinię wysłane: ${info.messageId}`);
+        return info;
+    } catch (error) {
+        console.error('Błąd podczas wysyłania powiadomienia o odpowiedzi na opinię:', error);
+        throw error;
+    }
+};
