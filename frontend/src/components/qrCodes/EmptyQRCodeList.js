@@ -1,7 +1,7 @@
 // frontend/src/components/qrcodes/EmptyQRCodeList.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { QrcodeIcon, PlusIcon } from '@heroicons/react/outline';
+import { QrcodeIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 const EmptyQRCodeList = () => {
     return (

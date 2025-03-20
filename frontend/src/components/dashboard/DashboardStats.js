@@ -5,7 +5,7 @@ import {
     QrcodeIcon,
     ChatAlt2Icon,
     StarIcon
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 
 const DashboardStats = ({ stats }) => {
     const { totalSurveys, totalQRCodes, totalFeedback, averageRating } = stats;

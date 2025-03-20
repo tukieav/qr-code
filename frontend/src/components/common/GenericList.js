@@ -1,6 +1,6 @@
 // src/components/common/GenericList.js
 import React, { useState } from 'react';
-import { PencilAltIcon, TrashIcon, SwitchHorizontalIcon } from '@heroicons/react/outline';
+import { PencilAltIcon, TrashIcon, SwitchHorizontalIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -18,12 +18,14 @@ import ConfirmDialog from './ConfirmDialog';
  * @param {Function} props.onDelete - Funkcja do usuwania elementu
  * @param {String} props.editUrlPrefix - Prefiks URL do edycji elementu (np. "/surveys/edit/")
  * @param {JSX.Element} props.emptyComponent - Komponent wyświetlany gdy lista jest pusta
- * @param {Array} props.additionalActions - Dodatkowe akcje dla elementów listy (opcjonalne)
+ * @param {Function|Array} props.additionalActions - Funkcja lub tablica akcji dla elementów listy
+ * @param {String} props.idField - Nazwa pola ID w elementach (domyślnie "_id")
+ * @param {Object} props.classes - Niestandardowe klasy CSS
  * @returns {JSX.Element} Komponent listy
  */
 const GenericList = ({
-                         items,
-                         columns,
+                         items = [],
+                         columns = [],
                          sortColumn,
                          sortDirection,
                          onSort,
@@ -31,9 +33,26 @@ const GenericList = ({
                          onDelete,
                          editUrlPrefix,
                          emptyComponent,
-                         additionalActions = []
+                         additionalActions = [],
+                         idField = '_id',
+                         classes = {}
                      }) => {
     const [itemToDelete, setItemToDelete] = useState(null);
+
+    // Domyślne klasy CSS
+    const defaultClasses = {
+        table: 'min-w-full divide-y divide-gray-200',
+        header: 'bg-gray-50',
+        headerCell: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+        headerSortable: 'cursor-pointer',
+        row: 'bg-white hover:bg-gray-50',
+        cell: 'px-6 py-4 whitespace-nowrap',
+        actionButton: 'text-blue-600 hover:text-blue-900 mx-1',
+        deleteButton: 'text-red-600 hover:text-red-900 mx-1'
+    };
+
+    // Połączenie domyślnych klas z niestandardowymi
+    const mergedClasses = { ...defaultClasses, ...classes };
 
     // Jeśli brak elementów, wyświetl komponent dla pustej listy
     if (!items || items.length === 0) {
@@ -50,8 +69,8 @@ const GenericList = ({
 
         return (
             <span className="ml-1">
-        {sortDirection === 'asc' ? '▲' : '▼'}
-      </span>
+                {sortDirection === 'asc' ? '▲' : '▼'}
+            </span>
         );
     };
 
@@ -66,14 +85,15 @@ const GenericList = ({
     // Renderowanie przycisków akcji dla elementu
     const renderActions = (item) => {
         const actions = [];
+        const itemId = item[idField];
 
         // Dodaj przycisk edycji jeśli podano prefiks URL
         if (editUrlPrefix) {
             actions.push(
                 <Link
                     key="edit"
-                    to={`${editUrlPrefix}${item._id}`}
-                    className="text-blue-600 hover:text-blue-900"
+                    to={`${editUrlPrefix}${itemId}`}
+                    className={mergedClasses.actionButton}
                     title="Edytuj"
                 >
                     <PencilAltIcon className="h-5 w-5" />
@@ -82,12 +102,12 @@ const GenericList = ({
         }
 
         // Dodaj przycisk przełączania aktywności
-        if (onToggleActive) {
+        if (onToggleActive && typeof item.is_active !== 'undefined') {
             actions.push(
                 <button
                     key="toggle"
-                    onClick={() => onToggleActive(item._id, item.is_active)}
-                    className="text-blue-600 hover:text-blue-900"
+                    onClick={() => onToggleActive(itemId, item.is_active)}
+                    className={mergedClasses.actionButton}
                     title={item.is_active ? 'Dezaktywuj' : 'Aktywuj'}
                 >
                     <SwitchHorizontalIcon className="h-5 w-5" />
@@ -98,7 +118,9 @@ const GenericList = ({
         // Dodaj dodatkowe akcje specyficzne dla elementu
         if (typeof additionalActions === 'function') {
             const customActions = additionalActions(item);
-            actions.push(...customActions);
+            if (Array.isArray(customActions)) {
+                actions.push(...customActions);
+            }
         } else if (Array.isArray(additionalActions)) {
             actions.push(...additionalActions);
         }
@@ -108,8 +130,8 @@ const GenericList = ({
             actions.push(
                 <button
                     key="delete"
-                    onClick={() => setItemToDelete(item._id)}
-                    className="text-red-600 hover:text-red-900"
+                    onClick={() => setItemToDelete(itemId)}
+                    className={mergedClasses.deleteButton}
                     title="Usuń"
                 >
                     <TrashIcon className="h-5 w-5" />
@@ -127,14 +149,14 @@ const GenericList = ({
     return (
         <>
             <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <table className={mergedClasses.table}>
+                    <thead className={mergedClasses.header}>
                     <tr>
                         {columns.map((column) => (
                             <th
                                 key={column.name}
                                 scope="col"
-                                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.sortable ? 'cursor-pointer' : ''}`}
+                                className={`${mergedClasses.headerCell} ${column.sortable ? mergedClasses.headerSortable : ''}`}
                                 onClick={() => column.sortable && onSort && onSort(column.name)}
                             >
                                 <div className="flex items-center">
@@ -143,20 +165,20 @@ const GenericList = ({
                                 </div>
                             </th>
                         ))}
-                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" className={`${mergedClasses.headerCell} text-right`}>
                             Akcje
                         </th>
                     </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                     {items.map((item) => (
-                        <tr key={item._id}>
+                        <tr key={item[idField]} className={mergedClasses.row}>
                             {columns.map((column) => (
-                                <td key={`${item._id}-${column.name}`} className="px-6 py-4 whitespace-nowrap">
+                                <td key={`${item[idField]}-${column.name}`} className={mergedClasses.cell}>
                                     {column.render ? column.render(item) : item[column.name]}
                                 </td>
                             ))}
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className={mergedClasses.cell}>
                                 {renderActions(item)}
                             </td>
                         </tr>

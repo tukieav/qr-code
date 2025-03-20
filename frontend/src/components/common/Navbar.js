@@ -1,7 +1,7 @@
 // src/components/common/Navbar.js
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { BellIcon, CogIcon } from '@heroicons/react/outline';
+import { BellIcon, CogIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
 

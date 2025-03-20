@@ -1,7 +1,7 @@
 // src/components/common/Notification.js
 import React, { useContext, useEffect } from 'react';
 import { UIContext } from '../../context/UIContext';
-import { CheckCircleIcon, ExclamationIcon, InformationCircleIcon, XCircleIcon, XIcon } from '@heroicons/react/solid';
+import { CheckCircleIcon, ExclamationIcon, InformationCircleIcon, XCircleIcon, XIcon } from '@heroicons/react/24/solid';
 
 const Notification = () => {
     const { notification, hideNotification } = useContext(UIContext);

@@ -1,6 +1,6 @@
 // src/components/surveys/SurveyList.js
 import React from 'react';
-import { DocumentTextIcon, DuplicateIcon } from '@heroicons/react/outline';
+import { DocumentTextIcon, DuplicateIcon } from '@heroicons/react/24/outline';
 import GenericList from '../common/GenericList';
 import EmptySurveyList from './EmptySurveyList';
 

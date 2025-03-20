@@ -5,7 +5,7 @@ import {
     PencilAltIcon,
     TrashIcon,
     SwitchHorizontalIcon
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 
 /**
  * Komponent uniwersalny do wyświetlania przycisków akcji dla elementów listy

@@ -1,7 +1,7 @@
 // src/pages/Subscription/SubscriptionPlan.js
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckIcon } from '@heroicons/react/solid';
+import { CheckIcon } from '@heroicons/react/24/solid';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
 import api from '../../services/api';

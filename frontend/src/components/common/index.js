@@ -7,7 +7,6 @@ import Sidebar from './Sidebar';
 import ConfirmDialog from './ConfirmDialog';
 import DataFilters from './DataFilters';
 import DataItemActions from './DataItemActions';
-import DataList from './DataList';
 import GenericList from './GenericList';
 import Notification from './Notification';
 import PrivateRoute from './PrivateRoute';
@@ -19,11 +18,14 @@ export {
     ConfirmDialog,
     DataFilters,
     DataItemActions,
-    DataList,
-    GenericList, // Nowy komponent
+    GenericList,
     Notification,
     PrivateRoute
 };
+
+// Eksport przestarzałych komponentów dla zachowania wstecznej zgodności
+// Można usunąć po pełnej migracji
+export const DataList = GenericList; // Dla zachowania kompatybilności
 
 // Eksport domyślny - wszystkie komponenty
 export default {
@@ -32,8 +34,7 @@ export default {
     ConfirmDialog,
     DataFilters,
     DataItemActions,
-    DataList,
-    GenericList, // Nowy komponent
+    GenericList,
     Notification,
     PrivateRoute
 };

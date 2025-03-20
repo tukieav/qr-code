@@ -1,6 +1,6 @@
 // src/components/qrCodes/QRCodeList.js
 import React from 'react';
-import { QrcodeIcon, DownloadIcon } from '@heroicons/react/outline';
+import { QrcodeIcon, DownloadIcon } from '@heroicons/react/24/outline';
 import { QRCodeSVG } from 'qrcode.react';
 import GenericList from '../common/GenericList';
 import EmptyQRCodeList from './EmptyQRCodeList';
@@ -86,35 +86,33 @@ const QRCodeList = ({
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                 }`}>
-          {qrCode.is_active ? 'Aktywny' : 'Nieaktywny'}
-        </span>
+                    {qrCode.is_active ? 'Aktywny' : 'Nieaktywny'}
+                </span>
             )
         }
     ];
 
     // Funkcja generująca dodatkowe akcje dla każdego kodu QR
-    const getQRCodeAdditionalActions = (qrCode) => {
-        return [
-            // Przycisk podglądu
-            <button
-                key="view"
-                onClick={() => handleGetQRCode(qrCode._id)}
-                className="text-blue-600 hover:text-blue-900"
-                title="Podgląd"
-            >
-                <QrcodeIcon className="h-5 w-5" />
-            </button>,
-            // Przycisk pobrania
-            <button
-                key="download"
-                onClick={() => handleDownloadQRCode(qrCode)}
-                className="text-blue-600 hover:text-blue-900"
-                title="Pobierz QR"
-            >
-                <DownloadIcon className="h-5 w-5" />
-            </button>
-        ];
-    };
+    const getQRCodeAdditionalActions = (qrCode) => [
+        // Przycisk podglądu
+        <button
+            key="view"
+            onClick={() => handleGetQRCode(qrCode._id)}
+            className="text-blue-600 hover:text-blue-900"
+            title="Podgląd"
+        >
+            <QrcodeIcon className="h-5 w-5" />
+        </button>,
+        // Przycisk pobrania
+        <button
+            key="download"
+            onClick={() => handleDownloadQRCode(qrCode)}
+            className="text-blue-600 hover:text-blue-900"
+            title="Pobierz QR"
+        >
+            <DownloadIcon className="h-5 w-5" />
+        </button>
+    ];
 
     return (
         <GenericList

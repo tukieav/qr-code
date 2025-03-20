@@ -1,29 +1,109 @@
-// frontend/src/components/surveys/EmptySurveyList.js
+// src/components/surveys/SurveyList.js
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { DocumentTextIcon, PlusIcon } from '@heroicons/react/outline';
+import { DocumentTextIcon, DuplicateIcon } from '@heroicons/react/24/outline';
+import GenericList from '../common/GenericList';
+import EmptySurveyList from './EmptySurveyList';
 
-const EmptySurveyList = () => {
+/**
+ * Komponent wyświetlający listę ankiet wykorzystujący komponent GenericList
+ */
+const SurveyList = ({
+                        surveys,
+                        sortColumn,
+                        sortDirection,
+                        handleSort,
+                        handleToggleActive,
+                        handleDuplicateSurvey,
+                        handleDeleteSurvey,
+                        formatDate
+                    }) => {
+    // Definicje kolumn dla listy ankiet
+    const columns = [
+        {
+            name: 'title',
+            label: 'Tytuł ankiety',
+            sortable: true,
+            render: (survey) => (
+                <div className="flex items-center">
+                    <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-md">
+                        <DocumentTextIcon className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{survey.title}</div>
+                        <div className="text-sm text-gray-500">
+                            {survey.description ? (
+                                survey.description.length > 50
+                                    ? `${survey.description.substring(0, 50)}...`
+                                    : survey.description
+                            ) : (
+                                'Brak opisu'
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        {
+            name: 'question_count',
+            label: 'Pytania',
+            sortable: true,
+            render: (survey) => (
+                <div className="text-sm text-gray-900">{survey.questions?.length || 0}</div>
+            )
+        },
+        {
+            name: 'creation_date',
+            label: 'Data utworzenia',
+            sortable: true,
+            render: (survey) => (
+                <div className="text-sm text-gray-900">{formatDate(survey.creation_date)}</div>
+            )
+        },
+        {
+            name: 'is_active',
+            label: 'Status',
+            sortable: true,
+            render: (survey) => (
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    survey.is_active
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                }`}>
+                    {survey.is_active ? 'Aktywna' : 'Nieaktywna'}
+                </span>
+            )
+        }
+    ];
+
+    // Funkcja generująca dodatkowe akcje dla każdej ankiety
+    const getSurveyAdditionalActions = (survey) => {
+        return [
+            // Przycisk duplikowania
+            <button
+                key="duplicate"
+                onClick={() => handleDuplicateSurvey(survey)}
+                className="text-blue-600 hover:text-blue-900"
+                title="Duplikuj"
+            >
+                <DuplicateIcon className="h-5 w-5" />
+            </button>
+        ];
+    };
+
     return (
-        <div className="py-16 px-6 text-center">
-            <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-lg font-medium text-gray-900">
-                Brak ankiet
-            </h3>
-            <p className="mt-1 text-gray-500">
-                Rozpocznij zbieranie opinii, tworząc swoją pierwszą ankietę.
-            </p>
-            <div className="mt-6">
-                <Link
-                    to="/surveys/create"
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                    Utwórz ankietę
-                </Link>
-            </div>
-        </div>
+        <GenericList
+            items={surveys}
+            columns={columns}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            onToggleActive={handleToggleActive}
+            onDelete={handleDeleteSurvey}
+            editUrlPrefix="/surveys/edit/"
+            emptyComponent={<EmptySurveyList />}
+            additionalActions={getSurveyAdditionalActions}
+        />
     );
 };
 
-export default EmptySurveyList;
+export default SurveyList;

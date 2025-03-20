@@ -1,6 +1,6 @@
 // src/components/dashboard/RecentFeedback.js
 import React from 'react';
-import { StarIcon, UserCircleIcon } from '@heroicons/react/solid';
+import { StarIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
 
 const RecentFeedback = ({ feedback }) => {

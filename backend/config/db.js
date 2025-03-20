@@ -1,35 +1,27 @@
 // backend/config/db.js
 const mongoose = require('mongoose');
-const config = require('./index');
+const dotenv = require('dotenv');
+
+// Załaduj zmienne środowiskowe z pliku .env
+dotenv.config();
 
 /**
  * Funkcja nawiązująca połączenie z bazą danych MongoDB
- * używając scentralizowanej konfiguracji
+ * używając konfiguracji z pliku .env
  */
 const connectDB = async () => {
     try {
-        // Użyj konfiguracji z pliku config/index.js
-        const conn = await mongoose.connect(config.db.uri, config.db.options);
+        // Użyj bezpośrednio URI z zmiennych środowiskowych
+        const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/qr-opinion';
+
+        const conn = await mongoose.connect(mongoURI);
 
         console.log(`MongoDB Connected: ${conn.connection.host}`);
 
         // Dodatkowe konfiguracje dla trybu debug
-        if (config.debug && config.db.debug) {
+        if (process.env.NODE_ENV === 'development') {
             mongoose.set('debug', true);
         }
-
-        // Obsługa zdarzeń połączenia
-        mongoose.connection.on('error', (err) => {
-            console.error(`MongoDB connection error: ${err}`);
-        });
-
-        mongoose.connection.on('disconnected', () => {
-            console.warn('MongoDB disconnected, attempting to reconnect...');
-        });
-
-        mongoose.connection.on('reconnected', () => {
-            console.info('MongoDB reconnected successfully');
-        });
 
         return conn;
     } catch (error) {

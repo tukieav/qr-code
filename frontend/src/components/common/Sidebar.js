@@ -10,7 +10,7 @@ import {
     LogoutIcon,
     MenuIcon,
     XIcon
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
 

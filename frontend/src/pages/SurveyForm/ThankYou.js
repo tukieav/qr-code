@@ -1,6 +1,6 @@
 // src/pages/SurveyForm/ThankYou.js
 import React from 'react';
-import { CheckCircleIcon } from '@heroicons/react/solid';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
 const ThankYou = () => {
     return (

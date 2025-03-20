@@ -1,7 +1,7 @@
 // frontend/src/pages/Surveys/SurveyManagement.js
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { PlusIcon } from '@heroicons/react/outline';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
 import api from '../../services/api';
