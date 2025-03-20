@@ -1,0 +1,56 @@
+// backend/config/environments/test.js
+
+/**
+ * Konfiguracja specyficzna dla środowiska testowego
+ */
+module.exports = {
+  // Tryb debugowania włączony
+  debug: true,
+
+  // Używaj testowej bazy danych
+  db: {
+    uri: process.env.TEST_MONGO_URI || 'mongodb://localhost:27017/qr-opinion-test',
+    // Opcje specyficzne dla testów
+    debug: true,
+    logQueries: true,
+    // Szybsza konfiguracja dla testów
+    poolSize: 5,
+    autoReconnect: true,
+    reconnectTries: 2
+  },
+
+  // Niższe limity dla testów wydajnościowych
+  rateLimit: {
+    enabled: false // Wyłącz rate limiting w środowisku testowym
+  },
+
+  // JWT z krótszym czasem życia dla testów
+  jwt: {
+    expiresIn: '1h' // Krótszy czas życia dla testów
+  },
+
+  // Konfiguracja CORS dla testów
+  cors: {
+    origin: '*', // Zezwalaj na wszystkie źródła w testach
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  },
+
+  // Logowanie dla testów
+  logging: {
+    level: 'debug',
+    format: 'dev',
+    silent: true // Brak logów konsoli podczas testów
+  },
+
+  // Konfiguracja dla mocków email
+  email: {
+    transport: 'mock', // Używaj mocka transportera email w testach
+    failRate: 0 // 0% failure rate dla testów
+  },
+
+  // Szybsze haszowanie haseł dla testów
+  bcrypt: {
+    saltRounds: 1 // Mniej rund dla szybszych testów (w produkcji używaj min. 10)
+  }
+};

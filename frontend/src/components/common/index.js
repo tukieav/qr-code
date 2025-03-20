@@ -1,4 +1,4 @@
-// frontend/src/components/common/index.js
+// src/components/common/index.js
 // Ten plik umożliwia łatwiejsze importowanie komponentów wspólnych
 
 // Importy komponentów
@@ -8,6 +8,7 @@ import ConfirmDialog from './ConfirmDialog';
 import DataFilters from './DataFilters';
 import DataItemActions from './DataItemActions';
 import DataList from './DataList';
+import GenericList from './GenericList';
 import Notification from './Notification';
 import PrivateRoute from './PrivateRoute';
 
@@ -19,6 +20,7 @@ export {
     DataFilters,
     DataItemActions,
     DataList,
+    GenericList, // Nowy komponent
     Notification,
     PrivateRoute
 };
@@ -31,6 +33,7 @@ export default {
     DataFilters,
     DataItemActions,
     DataList,
+    GenericList, // Nowy komponent
     Notification,
     PrivateRoute
 };

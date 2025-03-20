@@ -1,23 +1,65 @@
+// backend/server.js
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const config = require('./config');
 const errorHandler = require('./middleware/errorHandler');
 
-// Load environment variables
-dotenv.config();
-
-// Connect to database
-connectDB();
-
+// Inicjalizacja serwera Express
 const app = express();
 
-// Middleware
-app.use(cors());
+// Połączenie z bazą danych
+connectDB();
+
+// Middleware bezpieczeństwa
+if (process.env.NODE_ENV === 'production') {
+    // Helmet (bezpieczeństwo nagłówków HTTP)
+    app.use(helmet(config.helmet));
+
+    // Przekierowanie HTTP na HTTPS w produkcji
+    if (config.security && config.security.enableHttpsRedirect) {
+        app.use((req, res, next) => {
+            if (req.header('x-forwarded-proto') !== 'https') {
+                res.redirect(`https://${req.header('host')}${req.url}`);
+            } else {
+                next();
+            }
+        });
+    }
+}
+
+// Kompresja odpowiedzi
+if (config.security && config.security.enableCompression) {
+    app.use(compression());
+}
+
+// Parsowanie danych JSON
 app.use(express.json());
+
+// Parsowanie danych formularza
 app.use(express.urlencoded({ extended: false }));
 
-// Routes
+// Konfiguracja CORS
+app.use(cors(config.cors));
+
+// Logowanie żądań HTTP
+app.use(morgan(config.logging.format));
+
+// Ograniczenie liczby żądań
+if (process.env.NODE_ENV !== 'test' ||
+    (config.rateLimit && config.rateLimit.enabled !== false)) {
+    const limiter = rateLimit({
+        windowMs: config.rateLimit.windowMs,
+        max: config.rateLimit.max,
+        message: config.rateLimit.message || 'Too many requests, please try again later'
+    });
+    app.use(limiter);
+}
+
+// Trasy API
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/businesses', require('./routes/businessRoutes'));
 app.use('/api/surveys', require('./routes/surveyRoutes'));
@@ -25,15 +67,34 @@ app.use('/api/qrcodes', require('./routes/qrCodeRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/subscription', require('./routes/subscriptionRoutes'));
 
-
-// Public survey route (accessible without authentication)
+// Publiczna trasa do ankiet (dostępna bez uwierzytelniania)
 app.use('/survey', require('./routes/publicSurveyRoute'));
 
-// Error handler
+// Obsługa błędów 404
+app.use((req, res, next) => {
+    res.status(404).json({
+        success: false,
+        message: 'Endpoint not found'
+    });
+});
+
+// Middleware obsługi błędów
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Uruchomienie serwera
+const PORT = config.port || 5000;
+const server = app.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
+
+// Obsługa błędów niezłapanych
+process.on('unhandledRejection', (err, promise) => {
+    console.error(`Error: ${err.message}`);
+
+    // Zamknij serwer i zakończ proces w przypadku krytycznego błędu
+    if (process.env.NODE_ENV === 'production') {
+        server.close(() => process.exit(1));
+    }
+});
+
+module.exports = server; // Eksport dla testów

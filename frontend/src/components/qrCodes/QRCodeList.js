@@ -1,13 +1,12 @@
-// frontend/src/components/qrcodes/QRCodeList.js
+// src/components/qrCodes/QRCodeList.js
 import React from 'react';
 import { QrcodeIcon, DownloadIcon } from '@heroicons/react/outline';
 import { QRCodeSVG } from 'qrcode.react';
-import { DataList, DataItemActions } from '../common';
+import GenericList from '../common/GenericList';
 import EmptyQRCodeList from './EmptyQRCodeList';
 
 /**
  * Komponent wyświetlający listę kodów QR
- * Korzysta z uniwersalnego komponentu DataList
  */
 const QRCodeList = ({
                         qrCodes,
@@ -21,15 +20,10 @@ const QRCodeList = ({
                         handleDeleteQRCode,
                         formatDate
                     }) => {
-    // Jeśli nie ma kodów QR, pokazujemy komunikat
-    if (qrCodes.length === 0) {
-        return <EmptyQRCodeList />;
-    }
-
-    // Konfiguracja kolumn dla DataList
+    // Definicje kolumn dla listy kodów QR
     const columns = [
         {
-            key: 'name',
+            name: 'name',
             label: 'Nazwa kodu QR',
             sortable: true,
             render: (qrCode) => (
@@ -53,7 +47,7 @@ const QRCodeList = ({
             )
         },
         {
-            key: 'survey_title',
+            name: 'survey_title',
             label: 'Ankieta',
             sortable: true,
             render: (qrCode) => (
@@ -67,7 +61,7 @@ const QRCodeList = ({
             )
         },
         {
-            key: 'scan_count',
+            name: 'scan_count',
             label: 'Skanowań',
             sortable: true,
             render: (qrCode) => (
@@ -75,7 +69,7 @@ const QRCodeList = ({
             )
         },
         {
-            key: 'creation_date',
+            name: 'creation_date',
             label: 'Data utworzenia',
             sortable: true,
             render: (qrCode) => (
@@ -83,7 +77,7 @@ const QRCodeList = ({
             )
         },
         {
-            key: 'is_active',
+            name: 'is_active',
             label: 'Status',
             sortable: true,
             render: (qrCode) => (
@@ -92,60 +86,48 @@ const QRCodeList = ({
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                 }`}>
-                    {qrCode.is_active ? 'Aktywny' : 'Nieaktywny'}
-                </span>
+          {qrCode.is_active ? 'Aktywny' : 'Nieaktywny'}
+        </span>
             )
-        },
-        {
-            key: 'actions',
-            label: 'Akcje',
-            render: (qrCode) => {
-                // Dodatkowe przyciski akcji dla kodu QR
-                const additionalActions = [
-                    // Przycisk podglądu
-                    <button
-                        key="view"
-                        onClick={() => handleGetQRCode(qrCode._id)}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="Podgląd"
-                    >
-                        <QrcodeIcon className="h-5 w-5" />
-                    </button>,
-                    // Przycisk pobrania
-                    <button
-                        key="download"
-                        onClick={() => handleDownloadQRCode(qrCode)}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="Pobierz QR"
-                    >
-                        <DownloadIcon className="h-5 w-5" />
-                    </button>
-                ];
-
-                return (
-                    <DataItemActions
-                        id={qrCode._id}
-                        isActive={qrCode.is_active}
-                        editUrl={`/qrcodes/edit/${qrCode._id}`}
-                        onToggleActive={handleToggleActive}
-                        onDelete={handleDeleteQRCode}
-                        additionalActions={additionalActions}
-                    />
-                );
-            }
         }
     ];
 
-    // Renderowanie komponentu DataList
+    // Funkcja generująca dodatkowe akcje dla każdego kodu QR
+    const getQRCodeAdditionalActions = (qrCode) => {
+        return [
+            // Przycisk podglądu
+            <button
+                key="view"
+                onClick={() => handleGetQRCode(qrCode._id)}
+                className="text-blue-600 hover:text-blue-900"
+                title="Podgląd"
+            >
+                <QrcodeIcon className="h-5 w-5" />
+            </button>,
+            // Przycisk pobrania
+            <button
+                key="download"
+                onClick={() => handleDownloadQRCode(qrCode)}
+                className="text-blue-600 hover:text-blue-900"
+                title="Pobierz QR"
+            >
+                <DownloadIcon className="h-5 w-5" />
+            </button>
+        ];
+    };
+
     return (
-        <DataList
-            data={qrCodes}
+        <GenericList
+            items={qrCodes}
             columns={columns}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             onSort={handleSort}
+            onToggleActive={handleToggleActive}
             onDelete={handleDeleteQRCode}
+            editUrlPrefix="/qrcodes/edit/"
             emptyComponent={<EmptyQRCodeList />}
+            additionalActions={getQRCodeAdditionalActions}
         />
     );
 };
