@@ -1,7 +1,7 @@
 // src/components/common/Notification.js
 import React, { useContext, useEffect } from 'react';
 import { UIContext } from '../../context/UIContext';
-import { CheckCircleIcon, ExclamationIcon, InformationCircleIcon, XCircleIcon, XIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const Notification = () => {
     const { notification, hideNotification } = useContext(UIContext);
@@ -34,7 +34,7 @@ const Notification = () => {
             textColorClass = 'text-red-800';
             break;
         case 'warning':
-            icon = <ExclamationIcon className="h-6 w-6" />;
+            icon = <ExclamationTriangleIcon className="h-6 w-6" />;
             bgColorClass = 'bg-yellow-50';
             textColorClass = 'text-yellow-800';
             break;
@@ -61,7 +61,7 @@ const Notification = () => {
                         className={`inline-flex ${textColorClass} hover:opacity-75 focus:outline-none`}
                         onClick={hideNotification}
                     >
-                        <XIcon className="h-5 w-5" />
+                        <XMarkIcon className="h-5 w-5" />
                     </button>
                 </div>
             </div>

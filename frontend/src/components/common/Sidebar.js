@@ -4,12 +4,12 @@ import { Link, useLocation } from 'react-router-dom';
 import {
     HomeIcon,
     DocumentTextIcon,
-    QrcodeIcon,
-    ChatAlt2Icon,
+    QrCodeIcon,
+    ChatBubbleLeftRightIcon,
     CreditCardIcon,
-    LogoutIcon,
-    MenuIcon,
-    XIcon
+    ArrowRightOnRectangleIcon,
+    Bars3Icon,
+    XMarkIcon
 } from '@heroicons/react/24/outline';
 import { AuthContext } from '../../context/AuthContext';
 import { UIContext } from '../../context/UIContext';
@@ -35,13 +35,13 @@ const Sidebar = () => {
         },
         {
             name: 'QR Codes',
-            icon: <QrcodeIcon className="h-6 w-6" />,
+            icon: <QrCodeIcon className="h-6 w-6" />,
             path: '/qrcodes',
             current: location.pathname.includes('/qrcodes')
         },
         {
             name: 'Feedback',
-            icon: <ChatAlt2Icon className="h-6 w-6" />,
+            icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />,
             path: '/feedback',
             current: location.pathname.includes('/feedback')
         },
@@ -71,7 +71,7 @@ const Sidebar = () => {
                     {/* Sidebar header */}
                     <div className="flex items-center justify-between px-4 py-5 border-b border-gray-700">
                         <div className="flex items-center">
-                            <QrcodeIcon className="h-8 w-8 text-blue-400" />
+                            <QrCodeIcon className="h-8 w-8 text-blue-400" />
                             <span className="ml-2 text-xl font-bold">QR Opinion</span>
                         </div>
 
@@ -80,7 +80,7 @@ const Sidebar = () => {
                             className="lg:hidden text-gray-400 hover:text-white"
                             onClick={() => setSidebarOpen(false)}
                         >
-                            <XIcon className="h-6 w-6" />
+                            <XMarkIcon className="h-6 w-6" />
                         </button>
                     </div>
 
@@ -123,7 +123,7 @@ const Sidebar = () => {
                                 className="w-full flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg"
                             >
                                 // Continuing src/components/common/Sidebar.js
-                                <LogoutIcon className="h-5 w-5 mr-2" />
+                                <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
                                 <span>Sign Out</span>
                             </button>
                         </div>
@@ -137,7 +137,7 @@ const Sidebar = () => {
                     onClick={() => setSidebarOpen(true)}
                     className="p-3 rounded-full bg-blue-600 text-white shadow-lg"
                 >
-                    <MenuIcon className="h-6 w-6" />
+                    <Bars3Icon className="h-6 w-6" />
                 </button>
             </div>
         </>

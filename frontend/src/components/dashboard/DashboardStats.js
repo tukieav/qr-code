@@ -2,8 +2,8 @@
 import React from 'react';
 import {
     DocumentTextIcon,
-    QrcodeIcon,
-    ChatAlt2Icon,
+    QrCodeIcon,
+    ChatBubbleLeftRightIcon,
     StarIcon
 } from '@heroicons/react/24/outline';
 
@@ -67,14 +67,14 @@ const DashboardStats = ({ stats }) => {
             <StatCard
                 title="Kody QR"
                 value={totalQRCodes}
-                icon={<QrcodeIcon className="h-6 w-6 text-white" />}
+                icon={<QrCodeIcon className="h-6 w-6 text-white" />}
                 color="bg-purple-500"
             />
 
             <StatCard
                 title="Zebrane opinie"
                 value={totalFeedback}
-                icon={<ChatAlt2Icon className="h-6 w-6 text-white" />}
+                icon={<ChatBubbleLeftRightIcon className="h-6 w-6 text-white" />}
                 color="bg-green-500"
             />
 

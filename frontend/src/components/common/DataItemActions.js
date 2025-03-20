@@ -2,9 +2,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-    PencilAltIcon,
+    PencilSquareIcon,
     TrashIcon,
-    SwitchHorizontalIcon
+    ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 
 /**
@@ -36,7 +36,7 @@ const DataItemActions = ({
                     className="text-blue-600 hover:text-blue-900"
                     title="Edytuj"
                 >
-                    <PencilAltIcon className="h-5 w-5" />
+                    <PencilSquareIcon className="h-5 w-5" />
                 </Link>
             )}
 
@@ -47,7 +47,7 @@ const DataItemActions = ({
                     className="text-blue-600 hover:text-blue-900"
                     title={isActive ? 'Dezaktywuj' : 'Aktywuj'}
                 >
-                    <SwitchHorizontalIcon className="h-5 w-5" />
+                    <ArrowsRightLeftIcon className="h-5 w-5" />
                 </button>
             )}
 

@@ -1,6 +1,6 @@
 // src/components/common/GenericList.js
 import React, { useState } from 'react';
-import { PencilAltIcon, TrashIcon, SwitchHorizontalIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -96,7 +96,7 @@ const GenericList = ({
                     className={mergedClasses.actionButton}
                     title="Edytuj"
                 >
-                    <PencilAltIcon className="h-5 w-5" />
+                    <PencilSquareIcon className="h-5 w-5" />
                 </Link>
             );
         }
@@ -110,7 +110,7 @@ const GenericList = ({
                     className={mergedClasses.actionButton}
                     title={item.is_active ? 'Dezaktywuj' : 'Aktywuj'}
                 >
-                    <SwitchHorizontalIcon className="h-5 w-5" />
+                    <ArrowsRightLeftIcon className="h-5 w-5" />
                 </button>
             );
         }

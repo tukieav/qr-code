@@ -1,6 +1,6 @@
 // src/components/surveys/SurveyList.js
 import React from 'react';
-import { DocumentTextIcon, DuplicateIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import GenericList from '../common/GenericList';
 import EmptySurveyList from './EmptySurveyList';
 
@@ -85,7 +85,7 @@ const SurveyList = ({
                 className="text-blue-600 hover:text-blue-900"
                 title="Duplikuj"
             >
-                <DuplicateIcon className="h-5 w-5" />
+                <DocumentDuplicateIcon className="h-5 w-5" />
             </button>
         ];
     };

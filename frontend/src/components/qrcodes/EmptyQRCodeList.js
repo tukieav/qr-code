@@ -1,12 +1,12 @@
 // frontend/src/components/qrcodes/EmptyQRCodeList.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { QrcodeIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { QrCodeIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 const EmptyQRCodeList = () => {
     return (
         <div className="py-16 px-6 text-center">
-            <QrcodeIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <QrCodeIcon className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-lg font-medium text-gray-900">
                 Brak kodów QR
             </h3>
