@@ -1,0 +1,160 @@
+/* Style dla stron autoryzacji (logowanie, rejestracja, reset hasła) */
+.auth-container {
+    @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8;
+}
+
+.auth-card {
+    @apply max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-xl transition-all duration-300;
+}
+
+.auth-logo {
+    @apply mx-auto h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center;
+}
+
+.auth-title {
+    @apply mt-6 text-center text-3xl font-extrabold text-gray-900;
+}
+
+.auth-subtitle {
+    @apply mt-2 text-center text-sm text-gray-600;
+}
+
+.auth-form {
+    @apply mt-8 space-y-6;
+}
+
+.auth-input-group {
+    @apply -space-y-px rounded-md shadow-sm;
+}
+
+.auth-input {
+    @apply appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm;
+}
+
+.auth-input-top {
+    @apply rounded-t-md;
+}
+
+.auth-input-bottom {
+    @apply rounded-b-md;
+}
+
+.auth-input-single {
+    @apply rounded-md;
+}
+
+.auth-checkbox-container {
+    @apply flex items-center justify-between;
+}
+
+.auth-checkbox-label {
+    @apply flex items-center;
+}
+
+.auth-checkbox {
+    @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded;
+}
+
+.auth-checkbox-text {
+    @apply ml-2 block text-sm text-gray-900;
+}
+
+.auth-link {
+    @apply font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200;
+}
+
+.auth-submit-button {
+    @apply group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200;
+}
+
+.auth-submit-icon {
+    @apply absolute left-0 inset-y-0 flex items-center pl-3;
+}
+
+.auth-error {
+    @apply bg-red-50 p-4 rounded-md text-sm font-medium text-red-800;
+}
+
+.auth-success {
+    @apply bg-green-50 p-4 rounded-md text-sm font-medium text-green-800;
+}
+
+/* Efekt pulsowania dla przycisku */
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+/* Animacja dla błędów walidacji */
+.shake-animation {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+/* Wersja z gradientem dla przycisku */
+.gradient-button {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700;
+}
+
+/* Responsywne dostosowania */
+@media (max-width: 640px) {
+    .auth-card {
+        @apply p-6;
+    }
+
+    .auth-title {
+        @apply text-2xl;
+    }
+}
+
+/* Style dla wyświetlania siły hasła */
+.password-strength-meter {
+    @apply w-full h-1 bg-gray-200 rounded mt-1;
+}
+
+.password-strength-fill {
+    @apply h-1 rounded transition-all duration-300;
+}
+
+.strength-weak {
+    @apply bg-red-500;
+    width: 20%;
+}
+
+.strength-medium {
+    @apply bg-yellow-500;
+    width: 60%;
+}
+
+.strength-strong {
+    @apply bg-green-500;
+    width: 100%;
+}

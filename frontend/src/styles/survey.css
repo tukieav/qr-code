@@ -1,0 +1,299 @@
+/* Style dla formularzy ankiet */
+
+/* Kontener formularza ankiety */
+.survey-container {
+    @apply min-h-screen bg-gray-100 py-8 px-4;
+}
+
+.survey-card {
+    @apply max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden;
+}
+
+.survey-header {
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 p-6;
+}
+
+.survey-title {
+    @apply text-2xl font-bold text-white;
+}
+
+.survey-description {
+    @apply mt-2 text-blue-100 text-sm;
+}
+
+.survey-body {
+    @apply p-6;
+}
+
+.survey-footer {
+    @apply px-6 py-4 bg-gray-50 text-center text-gray-500 text-sm;
+}
+
+/* Pytania ankiety */
+.question-container {
+    @apply mb-6 pb-6 border-b border-gray-200 last:border-b-0 last:pb-0;
+}
+
+.question-header {
+    @apply mb-3 flex items-start;
+}
+
+.question-text {
+    @apply font-medium text-gray-800;
+}
+
+.question-required {
+    @apply ml-1 text-red-500;
+}
+
+/* Typy pytań */
+.rating-container {
+    @apply flex items-center;
+}
+
+.rating-star {
+    @apply mr-4 cursor-pointer text-3xl;
+}
+
+.rating-star-filled {
+    @apply text-yellow-400;
+}
+
+.rating-star-empty {
+    @apply text-gray-300;
+}
+
+.text-input {
+    @apply w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.textarea-input {
+    @apply w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.multiple-choice-container {
+    @apply space-y-2;
+}
+
+.multiple-choice-option {
+    @apply flex items-start cursor-pointer;
+}
+
+.multiple-choice-radio {
+    @apply mt-1 h-4 w-4 text-blue-600;
+}
+
+.multiple-choice-label {
+    @apply ml-2 text-gray-700;
+}
+
+/* Submit button */
+.survey-submit-button {
+    @apply w-full px-4 py-3 mt-6 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200;
+}
+
+/* Podświetlenie błędów walidacji */
+.validation-error {
+    @apply text-red-500 mt-1 text-sm;
+}
+
+.input-error {
+    @apply border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500;
+}
+
+/* Animacje */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Strona podziękowania */
+.thank-you-container {
+    @apply min-h-screen bg-gray-100 flex items-center justify-center p-4;
+}
+
+.thank-you-card {
+    @apply max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center;
+}
+
+.thank-you-icon {
+    @apply flex justify-center mb-4;
+}
+
+.thank-you-icon-svg {
+    @apply h-16 w-16 text-green-500;
+}
+
+.thank-you-title {
+    @apply text-2xl font-bold text-gray-800 mb-3;
+}
+
+.thank-you-message {
+    @apply text-gray-600 mb-6;
+}
+
+.thank-you-footer {
+    @apply border-t border-gray-200 pt-6;
+}
+
+.thank-you-note {
+    @apply text-sm text-gray-500;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500;
+}
+
+.loading-container {
+    @apply min-h-screen bg-gray-100 flex items-center justify-center;
+}
+
+.loading-text {
+    @apply mt-4 text-gray-600;
+}
+
+/* Error container */
+.error-container {
+    @apply min-h-screen bg-gray-100 flex items-center justify-center p-4;
+}
+
+.error-card {
+    @apply bg-white rounded-lg shadow-lg p-6 max-w-md w-full;
+}
+
+.error-title {
+    @apply text-2xl font-bold text-red-600 mb-4;
+}
+
+.error-message {
+    @apply text-gray-700 mb-6;
+}
+
+.error-button {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200;
+}
+
+/* Efekty hover dla gwiazdek */
+.rating-star:hover {
+    @apply transform scale-110;
+}
+
+.rating-container:hover .rating-star {
+    @apply text-gray-300;
+}
+
+.rating-container .rating-star:hover ~ .rating-star {
+    @apply text-gray-300;
+}
+
+.rating-container .rating-star:hover {
+    @apply text-yellow-400;
+}
+
+.rating-container:hover .rating-star:hover ~ .rating-star {
+    @apply text-gray-300;
+}
+
+/* Progress bar */
+.progress-container {
+    @apply mt-4 mb-6;
+}
+
+.progress-bar {
+    @apply w-full h-2 bg-gray-200 rounded-full overflow-hidden;
+}
+
+.progress-fill {
+    @apply h-2 bg-blue-600 transition-all duration-300 ease-out;
+}
+
+.progress-text {
+    @apply text-xs text-gray-500 text-right mt-1;
+}
+
+/* Wersja mobilna */
+@media (max-width: 640px) {
+    .survey-card {
+        @apply rounded-none shadow-none;
+    }
+
+    .survey-container {
+        @apply px-0 py-0;
+    }
+
+    .rating-star {
+        @apply mr-2 text-2xl;
+    }
+}
+
+/* Wersja z subtelnymi animacjami przejścia między pytaniami */
+.question-transition-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.question-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.question-transition-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.question-transition-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+/* Dodatkowe style dla przycisków nawigacji między pytaniami */
+.nav-buttons {
+    @apply flex justify-between mt-8;
+}
+
+.prev-button {
+    @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200;
+}
+
+.next-button {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200;
+}
+
+/* Stylizacja listy ankiet */
+.survey-list-item {
+    @apply flex items-center p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200;
+}
+
+.survey-list-icon {
+    @apply flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-md;
+}
+
+.survey-list-content {
+    @apply ml-4 flex-1;
+}
+
+.survey-list-title {
+    @apply text-sm font-medium text-gray-900;
+}
+
+.survey-list-description {
+    @apply text-sm text-gray-500;
+}
+
+.survey-list-stats {
+    @apply flex items-center space-x-4 text-sm text-gray-500;
+}
